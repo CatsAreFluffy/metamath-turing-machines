@@ -254,13 +254,13 @@ Axiom codes are assigned as follows.  -- means ignored.
     11  x   y   z   Push UNI
     12  x   y   z   Push ICS.  P2 is used for both y and ph.
     13  x   y   z   Push B6a1
-    14  x   y   z   Push B6a2
-    15  x   --  --  Generalization rule.  Pops a theorem of statement ph;
+    14  x   --  --  Generalization rule.  Pops a theorem of statement ph;
                     proves A. x ph.
-    >16 ps  --  --  Detachment rule.  Pops a minor premise (proof of ph), then
+    15  ps  --  --  Detachment rule.  Pops a minor premise (proof of ph), then
                     pops a major premise which is expected to match
                     ( ph -> ps ).  If the major premise matches, pushes ps,
                     else pushes moot.
+    >15 x   y   z   Push B6a2
 
 # Use of variables
 
@@ -582,9 +582,6 @@ proc main() {
     /* B6a1 */
     par1(); par2(); weq();  par3(); par1(); par2(); weq(); wal();  wim();
     select();
-    /* B6a2 */
-    par1(); par2(); wel();  par3(); par1(); par2(); wel(); wal();  wim();
-    select();
 
     /* GEN */
     /* ph */
@@ -603,6 +600,15 @@ proc main() {
     } else {
         topwff = 0;
     }
+    select();
+
+    /*
+    GEN and DET can leave incorrectly proved wffs in wfftop if the axiomcode is greater than their assigned axomcodes due to cparam() not firing,
+    So we nead an axiom to be assigned a subsequent axiomcode to clean up after them.
+    */
+
+    /* B6a2 */
+    par1(); par2(); wel();  par3(); par1(); par2(); wel(); wal();  wim();
     select();
 
     if (topwff == 1) {
